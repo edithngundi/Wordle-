@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">WordleApp</string>
+    <string name="letter_placeholder">A</string>
+    <string name="guess_string">Guess</string>
+    <string name="instruction_string">Type your guess here</string>
+    <string name="reset_string">RESET</string>
+    <string name="wordle_string">WORDLE?</string>
 </resources>
