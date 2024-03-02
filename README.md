@@ -31,7 +31,7 @@ The following **additional** features are implemented:
 
 Here's a walkthrough of implemented user stories:
 
-<img src='https://github.com/edithngundi/Wordle-App/wordle.gif' title='Video Walkthrough' width='' alt='Video Walkthrough'/>
+<img src='https://raw.githubusercontent.com/edithngundi/Wordle-App/main/wordle.gif' title='Video Walkthrough' alt='Video Walkthrough'/>
 
 GIF created with [Kap](https://getkap.co/) for macOS
 
