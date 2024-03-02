@@ -8,6 +8,12 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import android.graphics.Color
+import androidx.constraintlayout.widget.ConstraintLayout
+import nl.dionsegijn.konfetti.models.Shape
+import nl.dionsegijn.konfetti.models.Size
+import androidx.core.content.ContextCompat
+import nl.dionsegijn.konfetti.KonfettiView
 
 class MainActivity : AppCompatActivity() {
 
@@ -44,57 +50,27 @@ class MainActivity : AppCompatActivity() {
     }
     object FourLetterWordList {
         private val fourLetterWords = listOf(
-            "Area", "Army", "Baby", "Back", "Ball", "Band", "Bank", "Base", "Bill", "Body",
-            "Book", "Call", "Card", "Care", "Case", "Cash", "City", "Club", "Cost", "Date",
-            "Deal", "Door", "Duty", "East", "Edge", "Face", "Fact", "Farm", "Fear", "File",
-            "Film", "Fire", "Firm", "Fish", "Food", "Foot", "Form", "Fund", "Game", "Girl",
-            "Goal", "Gold", "Hair", "Half", "Hall", "Hand", "Head", "Help", "Hill", "Home",
-            "Hope", "Hour", "Idea", "Jack", "John", "Kind", "King", "Lack", "Lady", "Land",
-            "Life", "Line", "List", "Look", "Lord", "Loss", "Love", "Mark", "Mary", "Mind",
-            "Miss", "Move", "Name", "Need", "News", "Note", "Page", "Pain", "Pair", "Park",
-            "Part", "Past", "Path", "Paul", "Plan", "Play", "Post", "Race", "Rain", "Rate",
-            "Rest", "Rise", "Risk", "Road", "Rock", "Role", "Room", "Rule", "Sale", "Seat",
-            "Shop", "Show", "Side", "Sign", "Site", "Size", "Skin", "Sort", "Star", "Step",
-            "Task", "Team", "Term", "Test", "Text", "Time", "Tour", "Town", "Tree", "Turn",
-            "Type", "Unit", "User", "View", "Wall", "Week", "West", "Wife", "Will", "Wind",
-            "Wine", "Wood", "Word", "Work", "Year", "Bear", "Beat", "Blow", "Burn", "Call",
-            "Care", "Cast", "Come", "Cook", "Cope", "Cost", "Dare", "Deal", "Deny", "Draw",
-            "Drop", "Earn", "Face", "Fail", "Fall", "Fear", "Feel", "Fill", "Find", "Form",
-            "Gain", "Give", "Grow", "Hang", "Hate", "Have", "Head", "Hear", "Help", "Hide",
-            "Hold", "Hope", "Hurt", "Join", "Jump", "Keep", "Kill", "Know", "Land", "Last",
-            "Lead", "Lend", "Lift", "Like", "Link", "Live", "Look", "Lose", "Love", "Make",
-            "Mark", "Meet", "Mind", "Miss", "Move", "Must", "Name", "Need", "Note", "Open",
-            "Pass", "Pick", "Plan", "Play", "Pray", "Pull", "Push", "Read", "Rely", "Rest",
-            "Ride", "Ring", "Rise", "Risk", "Roll", "Rule", "Save", "Seek", "Seem", "Sell",
-            "Send", "Shed", "Show", "Shut", "Sign", "Sing", "Slip", "Sort", "Stay", "Step",
-            "Stop", "Suit", "Take", "Talk", "Tell", "Tend", "Test", "Turn", "Vary", "View",
-            "Vote", "Wait", "Wake", "Walk", "Want", "Warn", "Wash", "Wear", "Will", "Wish",
-            "Work", "Able", "Back", "Bare", "Bass", "Blue", "Bold", "Busy", "Calm", "Cold",
-            "Cool", "Damp", "Dark", "Dead", "Deaf", "Dear", "Deep", "Dual", "Dull", "Dumb",
-            "Easy", "Evil", "Fair", "Fast", "Fine", "Firm", "Flat", "Fond", "Foul", "Free",
-            "Full", "Glad", "Good", "Grey", "Grim", "Half", "Hard", "Head", "High", "Holy",
-            "Huge", "Just", "Keen", "Kind")
+            "Area", "Army", "Baby", "Back", "Bend")
             fun getRandomFourLetterWord(): String {
             return fourLetterWords.random()
         }
     }
     private fun populateGrid() {
         val gridLayout = findViewById<GridLayout>(R.id.gridLayout)
-        val columnCount = wordLength
-        val rowCount = maxAttempts
-
         val totalCells = wordLength * maxAttempts
         for (i in 0 until totalCells) {
             val gridItemView = LayoutInflater.from(this).inflate(R.layout.grid_item, gridLayout, false) as TextView
             gridLayout.addView(gridItemView)
         }
     }
+    private fun isValidGuess(guess: String): Boolean {
+        return guess.length == wordLength && guess.all { it.isLetter() }
+    }
     private fun checkCorrectness(guess:String){
-        if (guess.length != randomWord.length) {
-            Toast.makeText(this, "Enter a $wordLength-letter word", Toast.LENGTH_SHORT).show()
+        if (!isValidGuess(guess)) {
+            Toast.makeText(this, "Invalid guess. Enter a 4-letter word with no numbers or special characters.", Toast.LENGTH_SHORT).show()
             return
         }
-
         val gridLayout = findViewById<GridLayout>(R.id.gridLayout)
         for (i in 0 until randomWord.length) {
             val cellIndex = attempts * wordLength + i
@@ -115,6 +91,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
     private fun startNewGame() {
+        val mainLayout = findViewById<ConstraintLayout>(R.id.mainLayout)
+        mainLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.grayblack)) // Ensure this color is defined in your colors.xml
+        findViewById<KonfettiView>(R.id.viewKonfetti).reset()
         clearGrid()
         randomWord = FourLetterWordList.getRandomFourLetterWord().uppercase()
         attempts = 0
@@ -127,7 +106,22 @@ class MainActivity : AppCompatActivity() {
     private fun gameEnd(won: Boolean) {
         val message = if (won) "Congratulations, you've guessed the word!" else "Try again. The word was $randomWord."
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
-        // Reset game or provide an option to restart here...
+
+        if (won) {
+            val mainLayout = findViewById<ConstraintLayout>(R.id.mainLayout)
+            mainLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.light_teal))
+            val viewKonfetti = findViewById<KonfettiView>(R.id.viewKonfetti)
+            viewKonfetti.build()
+                .addColors(Color.parseColor("#9B59B6"), Color.parseColor("#8E44AD")) // Purple shades
+                .setDirection(0.0, 359.0)
+                .setSpeed(1f, 5f)
+                .setFadeOutEnabled(true)
+                .setTimeToLive(2000L)
+                .addShapes(Shape.RECT, Shape.CIRCLE)
+                .addSizes(Size(12))
+                .setPosition(-50f, viewKonfetti.width + 50f, -50f, -50f)
+                .streamFor(300, 5000L)
+        }
         submitButton.text = getString(R.string.reset_string)
     }
 }
